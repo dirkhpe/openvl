@@ -33,7 +33,8 @@ def package_show(package_name, ds_dir):
     :return:
     """
     if package_name is None:
-        print('Package Name needs to be defined!')
+        logging.error('Package Name needs to be defined!')
+        return False
     else:
         try:
             res = ckan_conn.action.package_show(id=package_name, include_tracking=1)
@@ -48,8 +49,9 @@ def package_show(package_name, ds_dir):
             f = open(outfile, 'w')
             # print("Organization: " + res['organization']['name'])
             f.write(json.dumps(res, indent=4))
-            logging.info("Output written to " + outfile)
+            logging.debug("Output written to " + outfile)
             f.close()
+            return True
 
 
 def get_ckan_conn():
@@ -71,7 +73,7 @@ def get_ckan_conn():
 
 
 # Get ini-file first.
-projectname = 'openvl'
+projectname = 'opennl'
 modulename = my_env.get_modulename(__file__)
 config = my_env.get_inifile(projectname, __file__)
 # Now configure logfile
@@ -81,15 +83,15 @@ ckan_conn = get_ckan_conn()
 logdir = config['Main']['logdir']
 dataset_dir = config['Main']['ds_dir']
 pl = package_list()
-cnt = 0
-total = 0
-for ds_id in pl:
+# First remove all datasets in directory
+filelist = [file for file in os.listdir(dataset_dir) if os.path.splitext(file)[1] == ".json"]
+logging.info("Remove all files from directory {dsdir}".format(dsdir=dataset_dir))
+for idx, file in enumerate(filelist):
+    os.remove(os.path.join(dataset_dir, file))
+# Then collect current datasets
+logging.info("Start to collect datasets")
+for idx, ds_id in enumerate(pl):
     package_show(ds_id, dataset_dir)
-    total += 1
-    cnt += 1
-    if cnt >= 10:
-        print("{total} datasets processed".format(total=total))
-        cnt = 0
-# set_pkg_private('18d67cd3-a9c5-45aa-b5bc-9be94c6cb258')
-# package_list()
+    if idx % 100 == 0:
+        logging.info("{idx} datasets processed".format(idx=idx))
 logging.info('End Application')

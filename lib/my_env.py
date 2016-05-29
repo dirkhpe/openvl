@@ -65,6 +65,7 @@ def init_loghandler(config, modulename):
     # Add Handler to the logger
     logger.addHandler(ch)
     logger.addHandler(rfh)
+    logging.getLogger("requests").setLevel(logging.WARNING)
     return logger
 
 

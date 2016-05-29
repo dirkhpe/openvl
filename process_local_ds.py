@@ -19,33 +19,39 @@ def handle_ds(filepath, ds, cols):
     rowdict = {}
     for col in cols:
         if col in res:
-            if col in ["resources", "tags"]:
+            if col in ["resources", "tags", "groups"]:
                 rowdict[col] = len(res[col])
             elif col in ["metadata_created", "metadata_modified"]:
                 rowdict[col] = dateutil.parser.parse(res[col]).strftime("%d/%m/%Y %H:%M:%S")
             elif res[col]:
                 rowdict[col] = res[col]
+    # Special handling for tracking_summary
+    if res["tracking_summary"]:
+        rowdict["tracking_summary_total"] = res["tracking_summary"]["total"]
+        rowdict["tracking_summary_recent"] = res["tracking_summary"]["recent"]
     ds.insert_row('dataset', rowdict)
     return
 
 
 if __name__ == "__main__":
     # Get ini-file first.
-    projectname = 'openvl'
+    projectname = 'opennl'
     modulename = my_env.get_modulename(__file__)
     config = my_env.get_inifile(projectname, __file__)
     # Now configure logfile
     my_env.init_loghandler(config, modulename)
     logging.info('Start Application')
     logdir = config['Main']['logdir']
-    scandir = config['Main']['ds_dir']
-    ds = DataStore(config)
+    dataset_dir = config['Main']['ds_dir']
+    dbConn = DataStore(config)
     # Reset Table
-    ds.remove_tables()
-    ds.create_tables()
-    cols = ds.get_columns('dataset')
-    print("Cols: {cols}".format(cols=cols))
-    filelist = [file for file in os.listdir(scandir) if os.path.splitext(file)[1] == ".json"]
-    for file in filelist:
-        handle_ds(os.path.join(scandir, file), ds, cols)
+    dbConn.remove_tables()
+    dbConn.create_tables()
+    columns = dbConn.get_columns('dataset')
+    print("Cols: {cols}".format(cols=columns))
+    filelist = [file for file in os.listdir(dataset_dir) if os.path.splitext(file)[1] == ".json"]
+    for idx, file in enumerate(filelist):
+        handle_ds(os.path.join(dataset_dir, file), dbConn, columns)
+        if idx % 100 == 0:
+            logging.info("{idx} files processed.".format(idx=idx))
     logging.info('End Application')

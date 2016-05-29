@@ -5,7 +5,7 @@ Dataset;Mandatory;Contact Point;dcat:contact-Point;v:Vcard;;0..n;Beheerder;maint
 Dataset;Mandatory;Dataset distribution;dcat:distribution;dcat:Distribution;;0..n;;resources;List, count length;
 Dataset;Mandatory;Publisher;dct:publisher;foaf:Agent;;0..1;Organisatie;author|author_email;;
 Dataset;Optional;Keyword/tag;dcat:keyword;rdfs:Literal;;0..n;Tags;tags;List, count length;
-Dataset;Optional;Theme/category;dcat:theme;skos:Concept;;0..n;Groep;;;
+Dataset;Optional;Theme/category;dcat:theme;skos:Concept;;0..n;Groep;groups;List, count length;
 Dataset;Optional;Access Rights;dct:accessRights;dct:RightsStatement;;0..1;Toegangsrechten;;;
 Dataset;Optional;Conforms to;dct:conformsTo;dct:Standard;;0..n;;;;
 Dataset;Optional;Documentations;foaf:page;foaf:Document;;0..n;Documentatie;;;
@@ -28,3 +28,8 @@ Dataset;Optional;Update/Modification date;dct:modified;xsd:dateTime;;0..1;Laatst
 Dataset;Optional;Version;schema:version;rdfs:Literal;;0..1;Versie;;;
 Dataset;Optional;Version Notes;adms:version-notes;rdfs:Literal;;0..n;Versie Nota's;;;
 Dataset;;;;;;;;creator_user_id;;How many different creators do we have. How many datasets per creator?
+;;;;;;;;owner_org;;How many different organizations do we have. How are creators and organizations linked?
+;;;;;;;;lod_stars;;LOD Classification (NL)
+;;;;;;;;theme_facet;;Group? (NL)
+;;;;;;;;tracking_summary_recent;Integer;Count of recent views
+;;;;;;;;tracking_summary_total;Integer;Count of total views

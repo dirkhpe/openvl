@@ -64,6 +64,8 @@ class DataStore:
         query = """
         CREATE TABLE dataset
             (id text primary key,
+             creator_user_id text,
+             owner_org text,
              name text unique,
              title text,
              notes text,
@@ -71,10 +73,15 @@ class DataStore:
              author_email text,
              maintainer text,
              maintainer_email text,
+             lod_stars text,
+             theme_facet text,
              resources integer,
              tags integer,
+             groups integer,
              metadata_created text,
-             metadata_modified text)
+             metadata_modified text,
+             tracking_summary_recent integer,
+             tracking_summary_total integer)
         """
         try:
             self.dbConn.execute(query)
@@ -100,7 +107,34 @@ class DataStore:
         else:
             logging.info("Drop table dataset")
             return True
-        query = 'DROP TABLE IF EXISTS distribution'
+
+    def create_table_user_data(self):
+        # Create table
+        query = """
+        CREATE TABLE user_data
+            (id text primary key,
+             name text,
+             fullname text,
+             display_name text,
+             about text,
+             state text,
+             number_of_edits integer,
+             number_created_packages integer,
+             created text)
+        """
+        try:
+            self.dbConn.execute(query)
+        except:
+            e = sys.exc_info()[1]
+            ec = sys.exc_info()[0]
+            log_msg = "Error during query execution - Attribute_action: %s %s"
+            logging.error(log_msg, e, ec)
+            return False
+        logging.info("Table user_data is build.")
+        return True
+
+    def remove_table_user_data(self):
+        query = 'DROP TABLE IF EXISTS user_data'
         try:
             self.dbConn.execute(query)
         except:
@@ -110,7 +144,7 @@ class DataStore:
             logging.error(log_msg, e, ec)
             return False
         else:
-            logging.info("Drop table distribution")
+            logging.info("Drop table user_data")
             return True
 
     def get_columns(self, tablename):
